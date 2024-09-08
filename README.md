@@ -1,27 +1,27 @@
-E-commerce Backend
+# E-commerce Backend System
 
-Descrição
+## Overview
+This project is a robust backend for an e-commerce application, designed to handle core functionalities such as user registration, product management, shopping cart functionality, and order processing. Built using Python, Flask, SQLAlchemy, and SQLite, this application provides a solid foundation for building a comprehensive e-commerce platform.
 
-Este projeto é um sistema backend para uma plataforma de e-commerce, onde os usuários podem se registrar, visualizar produtos, adicionar produtos ao carrinho e realizar pedidos. A aplicação utiliza Flask como framework web e SQLite como banco de dados.
+## Key Features:
+User Management:
+Secure user registration and login with password hashing.
+Profile management for personalized user experiences.
 
+Product Catalog:
+Comprehensive product management for admins, including adding, editing, and removing products.
+Detailed product information and categorization.
 
-Funcionalidades:
+Shopping Cart:
+Dynamic shopping cart functionality, allowing users to add, remove, and update items.
+Ability to save carts for later and retrieve order history.
 
-Gerenciamento de Usuários:
-    Registro, login, e gerenciamento de conta.
-    Autenticação de usuários com armazenamento seguro de senhas.
+Checkout Process:
+Secure checkout process with various payment gateway integrations (optional).
+Order confirmation and email notifications.
 
-Gerenciamento de Produtos:
-    Usuários admins podem adicionar, editar e remover produtos.
-    Usuários comuns podem visualizar produtos.
-
-Gerenciamento de Carrinho e Pedidos:
-    Usuários devem poder adicionar produtos ao carrinho.
-    Usuários devem poder visualizar o carrinho e realizar pedidos.
-    Após realizar um pedido, o carrinho deve ser limpo e os detalhes do pedido salvos.
-
-Tecnologias Utilizadas:
-Python
-Flask
-SQLAlchemy (ORM)
-SQLite (Banco de dados)
+## Technical Stack:
+Python: A versatile programming language for web development.
+Flask: A lightweight and flexible Python web framework.
+SQLAlchemy: An Object-Relational Mapper (ORM) that simplifies database interactions.
+SQLite: An embedded SQL database for storing application data.
