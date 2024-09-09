@@ -34,7 +34,7 @@ SQLite: An embedded SQL database for storing application data.
 ## Development Stages
 ### 1. Initial Setup
 Set up the Flask environment and configured SQLAlchemy.
-Decided to use SQLAlchemy because 
+Decided to use SQLAlchemy because it offers a robust and efficient Object-Relational Mapping (ORM) system that simplifies interactions with the SQLite database. By using SQLAlchemy, I can easily map Python objects to database tables, which makes managing user, product, and order data more intuitive.
 Initialized the database with users, products, and orders tables
 I created the database in the firsts stages to have an idea to what and how build the functions in the main application.
 
