@@ -124,7 +124,7 @@ def manage_account():
         return jsonify({"message": "Failed to retrieve account information"}), 500
 
 # Add product Route (only admin)
-@app.route('/products', methods=['POST'])
+@app.route('/products/add', methods=['POST'])
 def add_product():
     if 'user_id' not in session:
         return jsonify({"message": "Authentication required"}), 401
@@ -266,6 +266,28 @@ def delete_product():
     except Exception as e:
         print(f"Error: {e}")
         return jsonify({"message": "Failed to delete product"}), 500
+
+# List products Route
+@app.route('/products/list', methods=['GET'])
+def list_products():
+    # Check if the user is logged in
+    if 'user_id' not in session:
+        return jsonify({"message": "Authentication required"}), 401
+
+    try:
+        # Fetch all products from the database
+        products = Product.query.all()
+        if not products:
+            return jsonify({"message": "No products available"}), 404
+
+        # Create a list of products with relevant details
+        product_list = [{"id": p.id, "name": p.name, "description": p.description, "price": p.price, "stock": p.stock} for p in products]
+        
+        return jsonify(product_list), 200
+
+    except Exception as e:
+        print(f"Error: {e}")
+        return jsonify({"message": "Failed to retrieve products"}), 500
 
 
 if __name__ == '__main__':
