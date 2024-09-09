@@ -239,7 +239,33 @@ def edit_product():
         print(f"Error: {e}")
         return jsonify({"message": "Failed to update product"}), 500
 
-   
+# Delete product Route (only admin)
+@app.route('/products/delete', methods=['DELETE'])
+def delete_product():
+    if 'user_id' not in session:
+        return jsonify({"message": "Authentication required"}), 401
+    if not User.query.get(session['user_id']).is_admin:
+        return jsonify({"message": "Admin access required"}), 403
+
+    # Get product_id from the request and validate
+    data = request.get_json()
+    product_id = data.get('product_id')
+    if not product_id:
+        return jsonify({"message": "Product ID is required"}), 400
+
+    # Fetch the product from the database
+    product = Product.query.get(product_id)
+    if not product:
+        return jsonify({"message": "Product not found"}), 404
+
+    # Delete the product
+    try:
+        db.session.delete(product)
+        db.session.commit()
+        return jsonify({"message": "Product deleted successfully!"}), 200
+    except Exception as e:
+        print(f"Error: {e}")
+        return jsonify({"message": "Failed to delete product"}), 500
 
 
 if __name__ == '__main__':
