@@ -17,7 +17,7 @@ init_db(app)
 def register():
     try:
         data = request.get_json()
-        username = data.get('username')
+        username = data.get('username').lower() # convert to lower case
         password = data.get('password')
         is_admin = data.get('is_admin', False) # Add the possibility to create admin users.
 
@@ -70,6 +70,59 @@ def logout():
         return jsonify({"message": "Logged out successfully!"}), 200
     else:
         return jsonify({"message": "No user is currently logged in"}), 400
+
+# Account management Route
+@app.route('/account', methods=['GET', 'POST'])
+def manage_account():
+    user_id = session['user_id']
+    
+    if request.method == 'POST':
+        data = request.get_json()
+        new_username = data.get('new_username', '').lower()
+        new_password = data.get('new_password')
+
+        # Validate new_username and new_password
+        if new_username:
+            if len(new_username) < 5:
+                return jsonify({"message": "Username must be at least 5 characters"}), 400
+            existing_user = User.query.filter_by(username=new_username).first()
+            if existing_user and existing_user.id != user_id:
+                return jsonify({"message": "Username already taken"}), 400
+
+        if new_password:
+            if len(new_password) < 8:
+                return jsonify({"message": "Password must be at least 8 characters"}), 400
+
+        try:
+            user = User.query.get(user_id)
+            if user:
+                if new_username:
+                    user.username = new_username
+                    session['username'] = new_username  # Update username in session
+                if new_password:
+                    user.password = generate_password_hash(new_password)
+                db.session.commit()
+                return jsonify({"message": "Account updated successfully!"})
+            else:
+                return jsonify({"message": "User not found"}), 404
+        except Exception as e:
+            print(f"Error: {e}")
+            return jsonify({"message": "Failed to update account"}), 500
+
+    # Show account info
+    try:
+        user = User.query.get(user_id)
+        if user:
+            return jsonify({
+                "user_id": user.id,
+                "username": user.username
+            }), 200
+        else:
+            return jsonify({"message": "User not found"}), 404
+    except Exception as e:
+        print(f"Error: {e}")
+        return jsonify({"message": "Failed to retrieve account information"}), 500
+
 
 if __name__ == '__main__':
     app.run(debug=True)
