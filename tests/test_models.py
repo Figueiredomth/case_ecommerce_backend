@@ -11,6 +11,11 @@ def app():
     app.config['TESTING'] = True  # Add the testing method
     init_db(app)
 
+
+    with app.app_context():
+        print(f"Database URI for testing: {app.config['SQLALCHEMY_DATABASE_URI']}")  # Verifique o URI
+        db.create_all()
+        
     with app.app_context():
         db.create_all()  # Create the tables before the tests
 
@@ -39,8 +44,8 @@ def test_user_model(app):
 
 def test_product_model(app):
     with app.app_context():
-        # create a new product
-        new_product = Product(name='Test Product', price=10.0)
+        # create a new product with description
+        new_product = Product(name='Test Product', price=10.0, stock=100, description='A test product') 
         db.session.add(new_product)
         db.session.commit()
         
@@ -49,12 +54,15 @@ def test_product_model(app):
         assert product is not None
         assert product.name == 'Test Product'
         assert product.price == 10.0
+        assert product.stock == 100
+        assert product.description == 'A test product'
+
 
 def test_order_model(app):
     with app.app_context():
-        # create a bew user and product for the order
+        # create a new user and product for the order
         user = User(username='testuser', password='hashedpassword')
-        product = Product(name='Test Product', price=10.0)
+        product = Product(name='Test Product', price=10.0, stock=100, description='A test product')
         db.session.add(user)
         db.session.add(product)
         db.session.commit()
@@ -69,3 +77,6 @@ def test_order_model(app):
         assert order is not None
         assert order.user_id == user.id
         assert order.total == 10.0
+
+
+

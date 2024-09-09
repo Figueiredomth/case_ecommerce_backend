@@ -123,11 +123,14 @@ def manage_account():
         print(f"Error: {e}")
         return jsonify({"message": "Failed to retrieve account information"}), 500
 
-
+# Add product Route (only admin)
 @app.route('/products', methods=['POST'])
 def add_product():
-    if 'user_id' not in session or not User.query.get(session['user_id']).is_admin:
-        return jsonify({"message": "Unauthorized access"}), 403
+    if 'user_id' not in session:
+        return jsonify({"message": "Authentication required"}), 401
+    if not User.query.get(session['user_id']).is_admin:
+        return jsonify({"message": "Admin access required"}), 403
+
 
     data = request.get_json()
     name = data.get('name').lower()  # Convert product name to lowercase to avoid case conflicts
@@ -144,7 +147,14 @@ def add_product():
     if existing_product:
         return jsonify({"message": "Product with this name already exists"}), 400
     
-    # Validate price and stock <0
+    # Validate price and stock are numeric
+    try:
+        price = float(price)
+        stock = int(stock)
+    except ValueError:
+        return jsonify({"message": "Price and stock must be numeric values"}), 400
+
+    # Validate price and stock are not negative
     if price < 0:
         return jsonify({"message": "Price cannot be negative"}), 400
     if stock < 0:
