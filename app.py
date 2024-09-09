@@ -17,15 +17,16 @@ init_db(app)
 def register():
     try:
         data = request.get_json()
-        username = data['username']
-        password = data['password']
-        is_admin = data.get('is_admin', False)  # Add the possibility to create admin users.
+        username = data.get('username')
+        password = data.get('password')
+        is_admin = data.get('is_admin', False) # Add the possibility to create admin users.
 
         hashed_password = generate_password_hash(password)
 
         # Data validation
         if not username or not password:
             return jsonify({"message": "Username and password are required"}), 400
+
         if len(username) < 5 or len(password) < 8:
             return jsonify({"message": "Username must be at least 5 characters and password at least 8 characters"}), 400
 
@@ -41,7 +42,8 @@ def register():
 
         return jsonify({"message": "User registered successfully!"}), 201
 
-    except Exception as e:
+    # Other generic errors
+    except Exception as e:   
         print(f"Error: {e}")
         return jsonify({"message": "Failed to register user"}), 400
 
