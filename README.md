@@ -1,78 +1,79 @@
-# E-commerce Backend System
+# E-commerce Backend - Python Flask & SQLite
 
-## Overview
-This project is a robust backend for an e-commerce application, designed to handle core functionalities such as user registration, product management, shopping cart functionality, and order processing. Built using Python, Flask, SQLAlchemy, and SQLite, this application provides a solid foundation for building a comprehensive e-commerce platform.
+This project is a backend for an e-commerce system, developed in **Python Flask** with data persistence using **SQLite**. The backend includes functionalities such as **user registration and login**, **product management**, and **shopping cart**. In addition, there are **unit tests** to ensure code quality.
 
-## Key Features:
-User Management:
-Secure user registration and login with password hashing.
-Profile management for personalized user experiences.
+## Features
 
-Product Catalog:
-Comprehensive product management for admins, including adding, editing, and removing products.
-Detailed product information and categorization.
+- User registration
+- Authentication (login and logout)
+- Product addition and listing (only admins can add, edit, and remove products)
+- Shopping cart management
+- Product stock control
+- Data persistence using SQLite
+- Unit testing with pytest
 
-Shopping Cart:
-Dynamic shopping cart functionality, allowing users to add, remove, and update items.
-Ability to save carts for later and retrieve order history.
+## Technologies
 
-Checkout Process:
-Secure checkout process with various payment gateway integrations (optional).
-Order confirmation and email notifications.
+- **Python 3.8+**
+- **Flask** as the web framework
+- **SQLite** as the database
+- **SQLAlchemy** as the ORM
+- **Pytest** for unit testing
+- **Git** for version control
 
-## Technical Stack:
-Python: A versatile programming language for web development.
-Flask: A lightweight and flexible Python web framework.
-SQLAlchemy: An Object-Relational Mapper (ORM) that simplifies database interactions.
-SQLite: An embedded SQL database for storing application data.
+## How to run the project
 
+### Prerequisites
+
+Before starting, make sure you have Python 3.8 or later installed on your machine. You can check your Python version by running:
+
+```bash
+python --version
+```
+
+### Installing dependencies
+
+Clone the repository and install the dependencies listed in the `requirements.txt` file:
+
+```bash
+git clone https://github.com/Figueiredomth/case_commerce_backend.git
+cd case_commerce_backend
+pip install -r requirements.txt
+```
+
+### Running the application
+
+After installing the dependencies, run the Flask application:
+```bash
+flask run
+```
+
+### Running the tests
+
+To run the unit tests, use pytest:
+```bash
+pytest
+```
 
 ### Project Structure
-- models.py: Defines the data models.
-- app.py: Contains application routes and logic
+```bash
+ecommerce-backend/
+│
+├── app.py
+├── models.py
+│
+├── tests/
+│   ├── __init__.py
+│   ├── test_models.py
+│   └── test_routes.py
+├── requirements.txt
+└── README.md
+```
 
-## Development Stages
-### 1. Initial Setup
-Set up the Flask environment and configured SQLAlchemy.
-Decided to use SQLAlchemy because it offers a robust and efficient Object-Relational Mapping (ORM) system that simplifies interactions with the SQLite database. By using SQLAlchemy, I can easily map Python objects to database tables, which makes managing user, product, and order data more intuitive.
-Initialized the database with users, products, and orders tables
-I created the database in the firsts stages to have an idea to what and how build the functions in the main application.
+### Implemented Features
+- User Registration: Users can sign up by providing a username and password (hashed).
+- Authentication: The system supports login and logout, using token-based authentication.
+- Product Management: Only admin users can add, edit, and remove products.
+- ~~Shopping Cart: Users can add products to the cart and remove items, with stock control.~~ Under development
+- Unit Testing: Tests are performed on login, registration routes, and product features.
 
-
-### 2. Data Models (models.py)
-User: Models a user with attributes id, username, password, and is_admin.
-Decisions:
-Added is_admin column to determine if a user has administrative privileges.
-Usernames and passwords must meet minimum requirements.
-
-Product: Models a product with attributes id, name, description, price, and stock.
-Decisions:
-Validated that price and stock cannot be negative and stock have to be an integer number.
-Products cannot have negative prices or stock.
-
-Order: Models an order with attributes id, user_id, order_date, and total.
-Related the order to the user who placed it.
-
-### 3. Application Logic (app.py)
-User Registration (/register):
-Implemented to create new users with input validation and the option to set an admin status.
-
-User Login (/login):
-Decisions:
-Checked credentials and managed user session.
-Allow same request to login as a different user to simulate an environment that the same person can login in a different account.
-
-Logout (/logout):
-End the user's session.
-
-Account Management (/account):
-Allowed users to update their username and password.
-
-Add Product (/products):
-Decisions:
-Restricted access to administrators and validated product data, datatype, etc
-
-
-### Next Steps
-Add functionalities for editing and removing products.
-Implement unit tests to ensure system integrity as i add new features.
