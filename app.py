@@ -170,5 +170,77 @@ def add_product():
         return jsonify({"message": "Failed to add product"}), 500
 
 
+# Edit product Route (only admin)
+@app.route('/products/edit', methods=['PUT'])
+def edit_product():
+    # Check if the user is logged in and is an admin
+    if 'user_id' not in session:
+        return jsonify({"message": "Authentication required"}), 401
+    if not User.query.get(session['user_id']).is_admin:
+        return jsonify({"message": "Admin access required"}), 403
+
+    # Get data from the request
+    data = request.get_json()
+    product_id = data.get('product_id')
+    name = data.get('name').lower() if data.get('name') else None  # Convert name to lowercase to avoid case conflicts
+    description = data.get('description')
+    price = data.get('price')
+    stock = data.get('stock')
+
+    # Validate that product_id is provided
+    if not product_id:
+        return jsonify({"message": "Product ID is required"}), 400
+
+    # Fetch the product from the database
+    product = Product.query.get(product_id)
+    if not product:
+        return jsonify({"message": "Product not found"}), 404
+
+    # Check if name, price, and stock are missing (as required fields)
+    if not name and price is None and stock is None:
+        return jsonify({"message": "At least one field (name, price, or stock) must be provided for update"}), 400
+
+    # Check if a product with the same name already exists (case insensitive)
+    if name:
+        existing_product = Product.query.filter_by(name=name).first()
+        if existing_product and existing_product.id != product_id:
+            return jsonify({"message": "Product with this name already exists"}), 400
+
+    # Validate price and stock if provided
+    try:
+        if price is not None:
+            price = float(price)
+        if stock is not None:
+            stock = int(stock)
+    except ValueError:
+        return jsonify({"message": "Price and stock must be numeric values"}), 400
+
+    # Validate price and stock are not negative
+    if price is not None and price < 0:
+        return jsonify({"message": "Price cannot be negative"}), 400
+    if stock is not None and stock < 0:
+        return jsonify({"message": "Stock cannot be negative"}), 400
+
+    # Update product details if provided
+    if name is not None:
+        product.name = name
+    if description is not None:
+        product.description = description
+    if price is not None:
+        product.price = price
+    if stock is not None:
+        product.stock = stock
+
+    # Commit changes to the database
+    try:
+        db.session.commit()
+        return jsonify({"message": "Product updated successfully!"}), 200
+    except Exception as e:
+        print(f"Error: {e}")
+        return jsonify({"message": "Failed to update product"}), 500
+
+   
+
+
 if __name__ == '__main__':
     app.run(debug=True)
