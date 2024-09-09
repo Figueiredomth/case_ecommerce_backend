@@ -281,7 +281,7 @@ def list_products():
             return jsonify({"message": "No products available"}), 404
 
         # Create a list of products with relevant details
-        product_list = [{"id": p.id, "name": p.name, "description": p.description, "price": p.price, "stock": p.stock} for p in products]
+        product_list = [{"name": p.namestock} for p in products]
         
         return jsonify(product_list), 200
 
@@ -289,6 +289,29 @@ def list_products():
         print(f"Error: {e}")
         return jsonify({"message": "Failed to retrieve products"}), 500
 
+
+# List details of products Route
+@app.route('/products/details', methods=['GET'])
+def details_products():
+    # Check if the user is logged in
+    if 'user_id' not in session:
+        return jsonify({"message": "Authentication required"}), 401
+
+    try:
+        # Fetch all products from the database
+        products = Product.query.all()
+        if not products:
+            return jsonify({"message": "No products available"}), 404
+
+        # Create a list of products with relevant details
+        product_list = [{"name": p.name, "description": p.description, "price": p.price} for p in products]
+        
+        return jsonify(product_list), 200
+
+    except Exception as e:
+        print(f"Error: {e}")
+        return jsonify({"message": "Failed to retrieve products"}), 500
+    
 
 if __name__ == '__main__':
     app.run(debug=True)
