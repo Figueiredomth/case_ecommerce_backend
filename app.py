@@ -124,5 +124,41 @@ def manage_account():
         return jsonify({"message": "Failed to retrieve account information"}), 500
 
 
+@app.route('/products', methods=['POST'])
+def add_product():
+    if 'user_id' not in session or not User.query.get(session['user_id']).is_admin:
+        return jsonify({"message": "Unauthorized access"}), 403
+
+    data = request.get_json()
+    name = data.get('name').lower()  # Convert product name to lowercase to avoid case conflicts
+    description = data.get('description')
+    price = data.get('price')
+    stock = data.get('stock')
+
+    # Missing values output
+    if not name or price is None or stock is None:
+        return jsonify({"message": "Name, price, and stock are required"}), 400
+
+    # Check if product already exists
+    existing_product = Product.query.filter_by(name=name).first()
+    if existing_product:
+        return jsonify({"message": "Product with this name already exists"}), 400
+    
+    # Validate price and stock <0
+    if price < 0:
+        return jsonify({"message": "Price cannot be negative"}), 400
+    if stock < 0:
+        return jsonify({"message": "Stock cannot be negative"}), 400
+
+    try:
+        new_product = Product(name=name, description=description, price=price, stock=stock)
+        db.session.add(new_product)
+        db.session.commit()
+        return jsonify({"message": "Product added successfully!"}), 201
+    except Exception as e:
+        print(f"Error: {e}")
+        return jsonify({"message": "Failed to add product"}), 500
+
+
 if __name__ == '__main__':
     app.run(debug=True)
