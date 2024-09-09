@@ -1,6 +1,6 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, session
 from models import db, User, Product, Order, init_db
-from werkzeug.security import generate_password_hash
+from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
 
@@ -47,6 +47,29 @@ def register():
         print(f"Error: {e}")
         return jsonify({"message": "Failed to register user"}), 400
 
+# Login Route
+@app.route('/login', methods=['POST'])
+def login():
+    data = request.get_json()
+    username = data['username']
+    password = data['password']
+
+    # Checking on database if the user already exists and if the password is correct 
+    user = User.query.filter_by(username=username).first()
+    if user and check_password_hash(user.password, password):
+        session['user_id'] = user.id
+        return jsonify({"message": f"Welcome back, {user.username}!"}), 200
+    else:
+        return jsonify({"message": "Invalid username or password"}), 401
+
+# Logout Route
+@app.route('/logout', methods=['GET'])
+def logout():
+    if 'user_id' in session:
+        session.clear()
+        return jsonify({"message": "Logged out successfully!"}), 200
+    else:
+        return jsonify({"message": "No user is currently logged in"}), 400
 
 if __name__ == '__main__':
     app.run(debug=True)
