@@ -1,5 +1,5 @@
 from flask import Flask, jsonify, request, session
-from models import db, User, Product, Order, Cart, init_db
+from models import db, User, Product, Order, OrderItem, Cart, init_db
 from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
@@ -313,7 +313,7 @@ def details_products():
         return jsonify({"message": "Failed to retrieve products"}), 500
     
 
-
+# add product on cart Route
 @app.route('/cart/add', methods=['POST'])
 def add_to_cart():
     if 'user_id' not in session:
@@ -346,6 +346,7 @@ def add_to_cart():
         print(f"Error: {e}")
         return jsonify({"message": "Failed to add product to cart"}), 500
     
+# View cart Route
 @app.route('/cart/view', methods=['GET'])
 def view_cart():
     if 'user_id' not in session:
@@ -369,6 +370,53 @@ def view_cart():
     except Exception as e:
         print(f"Error: {e}")
         return jsonify({"message": "Failed to retrieve cart items"}), 500
+
+# Order route
+@app.route('/cart/checkout', methods=['POST'])
+def checkout():
+    if 'user_id' not in session:
+        return jsonify({"message": "Authentication required"}), 401
+
+    try:
+        # Fetch cart items for the user
+        cart_items = Cart.query.filter_by(user_id=session['user_id']).all()
+        if not cart_items:
+            return jsonify({"message": "Cart is empty"}), 404
+
+        total_price = sum(item.quantity * item.product.price for item in cart_items)
+
+        # Create a new order
+        order = Order(user_id=session['user_id'], total=total_price)
+        db.session.add(order)
+        db.session.commit()
+
+        # Create order items based on cart
+        for item in cart_items:
+            # Fetch the product to ensure we have the correct price
+            product = Product.query.get(item.product_id)
+            if product is None:
+                return jsonify({"message": f"Product with ID {item.product_id} not found"}), 404
+
+            order_item = OrderItem(
+                order_id=order.id, 
+                product_id=item.product_id, 
+                quantity=item.quantity,
+                price=product.price  # Use the price from the product
+            )
+            db.session.add(order_item)
+
+            # Decrease stock of the product
+            product.stock -= item.quantity
+            db.session.add(product)  # Ensure the product update is added to the session
+
+        # Clear the cart
+        Cart.query.filter_by(user_id=session['user_id']).delete()
+        db.session.commit()
+
+        return jsonify({"message": "Order placed successfully!", "order_id": order.id}), 201
+    except Exception as e:
+        print(f"Error: {e}")
+        return jsonify({"message": "Failed to place order"}), 500
 
 
 if __name__ == '__main__':
