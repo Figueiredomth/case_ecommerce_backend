@@ -346,6 +346,30 @@ def add_to_cart():
         print(f"Error: {e}")
         return jsonify({"message": "Failed to add product to cart"}), 500
     
+@app.route('/cart/view', methods=['GET'])
+def view_cart():
+    if 'user_id' not in session:
+        return jsonify({"message": "Authentication required"}), 401
+
+    try:
+        # Fetch cart items for the user
+        cart_items = Cart.query.filter_by(user_id=session['user_id']).all()
+        if not cart_items:
+            return jsonify({"message": "Cart is empty"}), 404
+
+        # Create a list of cart items with relevant details
+        cart_list = [{
+            "product_name": item.product.name,
+            "quantity": item.quantity,
+            "price_per_item": item.product.price,
+            "total_price": item.quantity * item.product.price
+        } for item in cart_items]
+
+        return jsonify(cart_list), 200
+    except Exception as e:
+        print(f"Error: {e}")
+        return jsonify({"message": "Failed to retrieve cart items"}), 500
+
 
 if __name__ == '__main__':
     app.run(debug=True)
