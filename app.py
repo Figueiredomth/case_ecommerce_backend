@@ -1,5 +1,5 @@
 from flask import Flask, jsonify, request, session
-from models import db, User, Product, Order, init_db
+from models import db, User, Product, Order, Cart, init_db
 from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
@@ -216,7 +216,7 @@ def edit_product():
         return jsonify({"message": "Price and stock must be numeric values"}), 400
 
     # Validate price and stock are not negative
-    if price is not None and price < 0:
+    if price is not None and price      < 0:
         return jsonify({"message": "Price cannot be negative"}), 400
     if stock is not None and stock < 0:
         return jsonify({"message": "Stock cannot be negative"}), 400
@@ -281,8 +281,8 @@ def list_products():
             return jsonify({"message": "No products available"}), 404
 
         # Create a list of products with relevant details
-        product_list = [{"name": p.namestock} for p in products]
-        
+        product_list = [{"name": p.name, "stock": p.stock} for p in products]
+
         return jsonify(product_list), 200
 
     except Exception as e:
@@ -311,6 +311,40 @@ def details_products():
     except Exception as e:
         print(f"Error: {e}")
         return jsonify({"message": "Failed to retrieve products"}), 500
+    
+
+
+@app.route('/cart/add', methods=['POST'])
+def add_to_cart():
+    if 'user_id' not in session:
+        return jsonify({"message": "Authentication required"}), 401
+
+    data = request.get_json()
+    product_id = data.get('product_id')
+    quantity = data.get('quantity', 1)
+
+    # Validate that product_id and quantity are provided
+    if not product_id or quantity <= 0:
+        return jsonify({"message": "Product ID and valid quantity are required"}), 400
+
+    # Fetch the product from the database
+    product = Product.query.get(product_id)
+    if not product:
+        return jsonify({"message": "Product not found"}), 404
+
+    # Check if there's enough stock
+    if product.stock < quantity:
+        return jsonify({"message": "Not enough stock available"}), 400
+
+    # Add the product to the cart (cart could be a separate table or stored in session)
+    try:
+        cart_item = Cart(user_id=session['user_id'], product_id=product.id, quantity=quantity)
+        db.session.add(cart_item)
+        db.session.commit()
+        return jsonify({"message": "Product added to cart successfully!"}), 201
+    except Exception as e:
+        print(f"Error: {e}")
+        return jsonify({"message": "Failed to add product to cart"}), 500
     
 
 if __name__ == '__main__':
