@@ -83,7 +83,7 @@ The server will be running at http://127.0.0.1:5000.
 - Users: Register, login, logout
 - Profile management: edit login and password or view the account information
 - Products: Add, update, and delete products (admin only), List products for customers
-- Cart: Add and view items from the cart
+- Cart: Add and clear items from the cart
 - Orders: Create user orders
 
 ### Main Endpoints
@@ -198,6 +198,13 @@ http://127.0.0.1:5000/cart/view: View the cart
 *Request example*
 ```bash
 GET http://127.0.0.1:5000/cart/view
+```
+
+http://127.0.0.1:5000/cart/clear: Clear the cart
+
+*Request example*
+```bash
+DELETE http://127.0.0.1:5000/cart/clear
 ```
 
 http://127.0.0.1:5000/order/checkout: Make a order based of what is in the cart
