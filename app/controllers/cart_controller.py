@@ -3,29 +3,30 @@ from app.services.cart_service import CartService
 
 cart_bp = Blueprint('cart', __name__)
 
+# Add product to the cart route
 @cart_bp.route('/add', methods=['POST'])
 def add_to_cart():
     # Check for authentication
     if 'user_id' not in session:
         return jsonify({"message": "Authentication required"}), 401
 
-    # Obtém os dados do produto e quantidade da requisição
+    # Get the data of product and quantity in request
     data = request.get_json()
     product_id = data.get('product_id')
     quantity = data.get('quantity', 1)  # Default quantity to 1 if not provided
 
-    # Chama o serviço para adicionar o produto ao carrinho
+    # add product to the cart
     result = CartService.add_to_cart(session['user_id'], product_id, quantity)
 
     return result
 
+# View cart route
 @cart_bp.route('/view', methods=['GET'])
 def view_cart():
-    # Verifica se o usuário está autenticado
     if 'user_id' not in session:
         return jsonify({"message": "Authentication required"}), 401
 
-    # Chama o serviço para visualizar o carrinho
+    # view the cart
     result = CartService.view_cart(session['user_id'])
 
     return result

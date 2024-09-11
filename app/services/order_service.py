@@ -5,20 +5,20 @@ class OrderService:
     @staticmethod
     def place_order(user_id):
         try:
-            # Buscar itens do carrinho do usuário
+            # Search for user itens in cart
             cart_items = Cart.query.filter_by(user_id=user_id).all()
             if not cart_items:
                 return {"message": "Cart is empty"}, 404
 
-            # Calcular o preço total
+            # Calculate the total price
             total_price = sum(item.quantity * item.product.price for item in cart_items)
 
-            # Criar um novo pedido
+            # Create a new order
             order = Order(user_id=user_id, total=total_price)
             db.session.add(order)
             db.session.commit()
 
-            # Adicionar itens ao pedido
+            # add item on the order
             for item in cart_items:
                 product = Product.query.get(item.product_id)
                 if product is None:
@@ -32,16 +32,16 @@ class OrderService:
                 )
                 db.session.add(order_item)
 
-                # Atualizar o estoque do produto
+                # Update the stock 
                 product.stock -= item.quantity
                 db.session.add(product)
 
-            # Limpar o carrinho
+            # clean the cart
             Cart.query.filter_by(user_id=user_id).delete()
             db.session.commit()
 
             return {"message": "Order placed successfully!", "order_id": order.id}, 200
         except Exception as e:
             print(f"Error: {e}")
-            db.session.rollback()  # Reverter qualquer alteração em caso de erro
+            db.session.rollback()  # Rollback if error
             return {"message": "Failed to place order"}, 500
