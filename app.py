@@ -2,6 +2,7 @@ from flask                              import Flask
 from app.models                         import db
 from app.controllers.user_controller    import user_bp
 from app.controllers.account_controller import account_bp
+from app.controllers.product_controller import product_bp
 
 def create_app():
     app = Flask(__name__)
@@ -18,6 +19,7 @@ def create_app():
     # Registers blueprints for modular controllers with specific URL prefixes
     app.register_blueprint(user_bp,     url_prefix= '/user')
     app.register_blueprint(account_bp,  url_prefix= '/account')
+    app.register_blueprint(product_bp,  url_prefix= '/products')
 
    
     # Ensures the tables are created in the database when the app context is available
