@@ -3,6 +3,7 @@ from app.services.account_service import manage_account, get_account_info
 
 account_bp = Blueprint('account_bp', __name__)
 
+# View account information and change account routes
 @account_bp.route('', methods=['GET', 'POST'])
 def account():
     user_id = session.get('user_id')

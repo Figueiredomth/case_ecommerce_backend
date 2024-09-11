@@ -51,3 +51,15 @@ class CartService:
             print(f"Error: {e}")
             # Handle errors during cart retrieval
             return {"message": "Failed to retrieve cart items"}, 500
+        
+    @staticmethod
+    def clear_cart(user_id):
+        try:
+            # Delete all cart items for the given user from the database
+            Cart.query.filter_by(user_id=user_id).delete()
+            db.session.commit()  # Commit the deletion to the database
+            return {"message": "Cart cleared successfully!"}, 200
+        except Exception as e:
+            print(f"Error: {e}")
+            # Handle any errors that occur during the deletion process
+            return {"message": "Failed to clear cart"}, 500

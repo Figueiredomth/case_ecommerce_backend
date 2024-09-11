@@ -5,7 +5,7 @@ cart_bp = Blueprint('cart', __name__)
 
 @cart_bp.route('/add', methods=['POST'])
 def add_to_cart():
-    # Verifica se o usuário está autenticado
+    # Check for authentication
     if 'user_id' not in session:
         return jsonify({"message": "Authentication required"}), 401
 
@@ -27,5 +27,16 @@ def view_cart():
 
     # Chama o serviço para visualizar o carrinho
     result = CartService.view_cart(session['user_id'])
+
+    return result
+
+@cart_bp.route('/clear', methods=['DELETE'])
+def clear_cart():
+    # Check if the user is authenticated
+    if 'user_id' not in session:
+        return jsonify({"message": "Authentication required"}), 401
+
+    # Call the service to clear the cart
+    result = CartService.clear_cart(session['user_id'])
 
     return result
