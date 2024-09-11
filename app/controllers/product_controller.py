@@ -4,6 +4,7 @@ from app.models import User
 
 product_bp = Blueprint('product_bp', __name__)
 
+# Add a product in database route (only admin)
 @product_bp.route('/add', methods=['POST'])
 def add_product_route():
     if 'user_id' not in session:
@@ -19,6 +20,7 @@ def add_product_route():
     data = request.get_json()
     return add_product(data)
 
+# Edit a existing product in database (only admin)
 @product_bp.route('/edit', methods=['PUT'])
 def edit_product_route():
     if 'user_id' not in session:
@@ -34,6 +36,7 @@ def edit_product_route():
     data = request.get_json()
     return edit_product(data)
 
+# Delete a existing product in database (only admin)
 @product_bp.route('/delete', methods=['DELETE'])
 def delete_product_route():
     if 'user_id' not in session:
@@ -50,6 +53,7 @@ def delete_product_route():
     product_id = data.get('product_id')
     return delete_product(product_id)
 
+# list all products in database 
 @product_bp.route('/list', methods=['GET'])
 def list_products_route():
     if 'user_id' not in session:
@@ -57,6 +61,7 @@ def list_products_route():
 
     return list_products()
 
+# list the details of all products in database
 @product_bp.route('/details', methods=['GET'])
 def details_products_route():
     if 'user_id' not in session:
