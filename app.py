@@ -3,6 +3,7 @@ from app.models                         import db
 from app.controllers.user_controller    import user_bp
 from app.controllers.account_controller import account_bp
 from app.controllers.product_controller import product_bp
+from app.controllers.cart_controller    import cart_bp
 
 def create_app():
     app = Flask(__name__)
@@ -20,6 +21,7 @@ def create_app():
     app.register_blueprint(user_bp,     url_prefix= '/user')
     app.register_blueprint(account_bp,  url_prefix= '/account')
     app.register_blueprint(product_bp,  url_prefix= '/products')
+    app.register_blueprint(cart_bp,     url_prefix= '/cart')
 
    
     # Ensures the tables are created in the database when the app context is available
