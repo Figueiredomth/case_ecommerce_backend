@@ -1,3 +1,2 @@
-ecommerce.db
+app.db
 __pycache__/
-instance/test_ecommerce.db
